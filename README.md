@@ -10,3 +10,5 @@ Imp parameters:
 
 Learned from:
 https://victorzhou.com/blog/intro-to-neural-networks/
+
+![Figure_1](https://user-images.githubusercontent.com/76858849/199891253-c90eb908-d57b-4610-96bb-7540048b4d99.jpeg)
