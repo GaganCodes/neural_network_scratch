@@ -1,14 +1,17 @@
-Implementing a basic neural network from scratch and comparing it with Scikit-Learn's MLP Classifier.
+Implementing a basic neural network from scratch and comparing it with Scikit-Learn's MLP Regressor.
 
-Code plots loss curve comparing the time taken by each method. Scikit-learn beats hard-coded implementation comfortably.
+Study 1: Basic performance comparison
+In this study we compare basic stochastic gradient descent with a similar implementation of Sklearn. Sklearn outperforms due to inherent optimizations in implementation.
 
-Imp parameters:
+Study 2: Comparison of dataset size against performance
+Sklearn takes more time due to persistent search for optimum solution.
+
+Study parameters:
 1. Sigmoid activation function
-2. One input layer
-3. One hidden layer with two neurons
-4. One output layer
+2. One input layer with three features
+3. One hidden layer with four neurons
+4. One output layer (regression task)
 
-Learned from:
-https://victorzhou.com/blog/intro-to-neural-networks/
 
-![Figure_1](https://user-images.githubusercontent.com/76858849/199891253-c90eb908-d57b-4610-96bb-7540048b4d99.jpeg)
+![Figure_1](https://github.com/GaganCodes/neural_network_scratch/assets/76858849/3df81a0f-e356-4cc4-b304-161a2af468fc)
+![Figure_2](https://github.com/GaganCodes/neural_network_scratch/assets/76858849/4a5581c9-f1d7-460f-9795-76997bbb3d25)
