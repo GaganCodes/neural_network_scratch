@@ -1,214 +1,263 @@
-# Importing relevant libraries
+"""
+Author: Gagandeep Randhawa
+
+Code organization (separated by #++++++++++ and checkpoints):
+1. Importing libraries (non-exhaustive)
+2. Defining the dataset
+3. Defining the neural network model and sklearn model
+4. Running the optimization / training
+5. Compare with scikit-learn
+"""
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Importing necessary libraries
+import matplotlib.pyplot as plt
 import numpy as np
-
-# Defining sigmoid function
-def sigmoid(x):
-    # f(x) = 1/(1 + e^(-x))
-    return 1/(1+np.exp(-x))
-
-# Defining derivative of sigmoid
-def d_sigmoid(x):
-    # f'(x) = f(x)*(1-f(x))
-    return sigmoid(x)*(1 - sigmoid(x))
-
-# Defining loss function
-def mse_loss(y_true, y_pred):
-    # These are assumed to be of same length for simplicity in implementation
-    return ((y_true - y_pred)**2).mean()
-
-# Defining Neuron
-class Neuron:
-    def __init__(self, weights, bias):
-        self.weights = weights
-        self.bias = bias
-    
-    def feedforward(self, inputs):
-        total = np.dot(self.weights, inputs) + self.bias
-        return sigmoid(total)
-
-# Defining NeuralNetwork structure
-class NeuralNetwork:
-    def __init__(self, learn_rate=0.1, epochs=5000):
-        self.learn_rate = learn_rate
-        self.epochs = epochs
-
-        # Defining weights
-        self.w1 = np.random.normal()
-        self.w2 = np.random.normal()
-        self.w3 = np.random.normal()
-        self.w4 = np.random.normal()
-        self.w5 = np.random.normal()
-        self.w6 = np.random.normal()
-
-        # Defining biases
-        self.b1 = np.random.normal()
-        self.b2 = np.random.normal()
-        self.b3 = np.random.normal()
-
-        # Storing the loss curve information
-        self.loss = []
-    
-    def feedforward(self, x):
-        # x is an input numpy array with 2 elements
-        # h1 and h2 are hidden nodes
-        h1 = sigmoid(self.w1*x[0] + self.w2*x[1] + self.b1)
-        h2 = sigmoid(self.w3*x[0] + self.w4*x[1] + self.b1)
-
-        o1 = sigmoid(self.w5*h1 + self.w6*h2 + self.b3)
-
-        return o1
-
-    def train(self, data, all_y_trues):
-        # data = assumed to be (n_samples, 2) numpy array
-        # all_y_trues = assumed to be (n_samples, ) numpy array
-
-        for epoch in range(self.epochs):
-            for x, y_true in zip(data, all_y_trues):
-                # Doing feedforward
-                sum_h1 = self.w1*x[0] + self.w2*x[1] + self.b1
-                h1 = sigmoid(sum_h1)
-
-                sum_h2 = self.w3*x[0] + self.w4*x[1] + self.b1
-                h2 = sigmoid(sum_h2)
-                
-                sum_o1 = self.w5*x[0] + self.w6*x[1] + self.b1
-                o1 = sigmoid(sum_o1)
-                
-                y_pred = o1
-
-                # Calculating required derivatives
-                # Naming: dL_dw = partial derivative of L wrt w
-                dL_dypred = -2*(y_true-y_pred)
-
-                # Node o1
-                dypred_dw5 = h1*d_sigmoid(sum_o1)
-                dypred_dw6 = h2*d_sigmoid(sum_o1)
-                dypred_db3 = d_sigmoid(sum_o1)
-                
-                dypred_h1 = self.w5*d_sigmoid(sum_o1)
-                dypred_h2 = self.w6*d_sigmoid(sum_o1)
-                
-                # Node h1
-                dh1_dw1 = x[0]*d_sigmoid(sum_h1)
-                dh1_dw2 = x[1]*d_sigmoid(sum_h1)
-                dh1_db1 = d_sigmoid(sum_h1)
-                
-                # Node h2
-                dh2_dw3 = x[0]*d_sigmoid(sum_h2)
-                dh2_dw4 = x[1]*d_sigmoid(sum_h2)
-                dh2_db2 = d_sigmoid(sum_h2)
-
-                # Updating weights and biases
-                # Node h1
-                self.w1 -= self.learn_rate*dL_dypred*dypred_h1*dh1_dw1
-                self.w2 -= self.learn_rate*dL_dypred*dypred_h1*dh1_dw2
-                self.b1 -= self.learn_rate*dL_dypred*dypred_h1*dh1_db1
-
-                # Node h2
-                self.w3 -= self.learn_rate*dL_dypred*dypred_h2*dh2_dw3
-                self.w4 -= self.learn_rate*dL_dypred*dypred_h2*dh2_dw4
-                self.b2 -= self.learn_rate*dL_dypred*dypred_h2*dh2_db2
-
-                # Node o1
-                self.w5 -= self.learn_rate*dL_dypred*dypred_dw5
-                self.w6 -= self.learn_rate*dL_dypred*dypred_dw6
-                self.b3 -= self.learn_rate*dL_dypred*dypred_db3
-
-            # Calculating total loss at the end of each epoch
-            y_preds = np.apply_along_axis(self.feedforward, 1, data)
-            self.loss.append(mse_loss(all_y_trues, y_preds))
-        
-        def get_loss(self):
-            return np.array(self.loss)
-
-# Running the problem
-data = np.array([
-    [  2, -16],
-    [ 21, -17],
-    [-20, -20],
-    [-17, -19],
-    [ 16,  14],
-    [ 24,  -2],
-    [  0,  11],
-    [ 17, -22],
-    [ -4,   5],
-    [-15,  -3],
-    [-21,  12],
-    [ -3,  -7],
-    [-12,  16],
-    [  5,   2],
-    [-10, -25],
-    [-18, -17],
-    [ -2, -15],
-    [ -6, -15],
-    [ -7, -12],
-    [ -3,   8],
-    [ 11, -24],
-    [ 13,  11],
-    [  6, -12],
-    [ 14,   3],
-    [ 15, -19],
-    [-18, -10],
-    [ -2,  20],
-    [  0, -17],
-    [  6,  16],
-    [-17,   1],
-    [ 10,  -6],
-    [-16, -10],
-    [ -6,  15],
-    [  9,   1],
-    [  8,  22],
-    [-10,  17],
-    [ -5,   3],
-    [ -1,  -5],
-    [ -6,  24],
-    [  1,   3],
-    [  3,   0],
-    [ 22,   0],
-    [ 17, -11],
-    [-21,  13],
-    [ 18, -19],
-    [ 16,  -2],
-    [-17,   7],
-    [ 24,  13],
-    [ 10,  -5],
-    [ 19,  -6]])
-
-all_y_trues = np.array([1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0,
-       1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1,
-       1, 0, 1, 1, 1, 0])
-
-
-# Comparing with Scikit-Learn
-from sklearn.neural_network import MLPClassifier
 import time
 
-clf = MLPClassifier(hidden_layer_sizes=(2,), activation='logistic',
-                    learning_rate_init=0.1, max_iter=5000, random_state=7,
-                    tol=1e-10, early_stopping=False)
+from sklearn.neural_network import MLPRegressor
 
-# Scikit Learn
-t1 = time.time()
-clf.fit(data, all_y_trues)
-t2 = time.time()
-time_sklean = t2-t1
+print("Checkpoint - Libraries imported.")
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Defining the dataset, separating into training and validation set
 
-# Hard-coded neural network
-network = NeuralNetwork()
-t1 = time.time()
-network.train(data, all_y_trues)
-t2 = time.time()
-time_NN = t2-t1
+np.random.seed(32)
 
-# Plotting comparison results
-import matplotlib.pyplot as plt
-figures, ax = plt.subplots()
-ax.grid()
-ax.plot(clf.loss_curve_, color='r', label="SKL, t=%.1fms"%(1000*time_sklean))
-ax.plot(network.loss, color='g', label="NN, t=%.1fms"%(1000*time_NN))
-ax.set_xlabel("Number of Iterations", fontsize="large")
-ax.set_ylabel("Loss", fontsize="large")
-ax.legend()
-ax.set_title("Loss Curve", fontsize="x-large")
+BATCH_SIZE = 32
+NUM_BATCH = 16
+HIDDEN_DIM = 4
+LEARNING_RATE = 0.01
+MAX_EPOCHS = 1500
+NUM_FEATURES = 3
 
-plt.show()
+X = np.random.randint(low=-20, high=20, size=(NUM_BATCH, BATCH_SIZE, NUM_FEATURES))
+Y = np.random.rand(NUM_BATCH, BATCH_SIZE, 1)
+
+print("Checkpoint - Dataset defined.")
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Defining the neural network model
+class NeuralNetwork:
+    r"""
+    For this example, we are looking at a one layered Neural Network with regression.
+    Code is structured so the node numbers can be flexible for any future experiments.
+
+    IMP: It is only done to understand training process (optimizing loss),
+    not making any predictions to assess generalization error, could be a
+    future extension.
+    """
+
+    def __init__(
+        self,
+        input_dim: int = 3,
+        hidden_dim: int = 4,
+        learn_rate: float = 0.001,
+        max_epochs: int = 1000,
+    ) -> None:
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.learn_rate = learn_rate
+        self.max_epochs = max_epochs
+
+        self.weight = dict()
+        self.grad = dict()
+        self.bias = dict()
+
+        self.loss_history = []
+
+        # Initializing the weight matrices to random small numbers
+        self.weight["w1"] = 0.01 * np.random.randn(self.input_dim, self.hidden_dim)
+        self.weight["w2"] = 0.01 * np.random.randn(self.hidden_dim, 1)
+        self.weight["b1"] = np.zeros(self.hidden_dim)
+        self.weight["b2"] = np.zeros(1)
+
+        # Initializing the gradient matrices
+        self.grad["w1"] = np.zeros((self.input_dim, self.hidden_dim))
+        self.grad["w2"] = np.zeros((self.hidden_dim, 1))
+        self.grad["b1"] = np.zeros(self.hidden_dim)
+        self.grad["b2"] = np.zeros(1)
+
+    def sigmoid(self, x) -> np.ndarray:
+        # f(x) = 1/(1 + e^(-x))
+        return 1.0 / (1.0 + np.exp(-x))
+
+    def d_sigmoid(self, x) -> np.ndarray:
+        # f'(x) = f(x)*(1-f(x))
+        fx = self.sigmoid(x)
+        return np.multiply(fx, 1 - fx)  # Element wise operation
+
+    def calculate_loss(self, y_pred, y_true) -> float:
+        # These are assumed to be of same length for simplicity in implementation
+        return ((y_true - y_pred) ** 2).mean()
+
+    def get_loss(self) -> list:
+        # Doing this to discourage external manipulation
+        return self.loss_history
+
+    def update(self) -> None:
+        for key in self.weight.keys():
+            self.weight[key] = self.weight[key] - self.learn_rate * self.grad[key]
+
+    def forward(self, x: np.ndarray, y: np.ndarray, training: bool = True) -> float:
+        """
+        Assuming there's batch training going on. N = batch_size
+        """
+
+        # Propagating the input forward
+        h1 = np.matmul(x, self.weight["w1"]) + self.weight["b1"]  # Dim (N, hidden_dim)
+        o1 = self.sigmoid(h1)  # Dim (N, hidden_dim)
+        h2 = np.matmul(o1, self.weight["w2"]) + self.weight["b2"]  # Dim (N, 1)
+        o2 = self.sigmoid(h2)  # Dim (N, 1)
+
+        # Calculating loss / performance
+        loss = self.calculate_loss(o2, y)  # Float
+
+        # Back propagation
+        if training:
+            # Defining each progressive derivative for chain rule
+            dl_do2 = 2 * (o2 - y)  # Dim (N, 1)
+            do2_dh2 = self.d_sigmoid(h2)  # Dim (N, 1)
+            dh2_dw2 = np.transpose(o1)  # Dim (hidden_dim, N)
+            dh2_do1 = np.transpose(self.weight["w2"])  # Dim (1, hidden_dim)
+            do1_dh1 = self.d_sigmoid(h1)  # Dim (N, hidden_dim)
+            dh1_dw1 = x  # Dim (N, input_dim)
+
+            # Applying chain rule for relevant gradient computation
+            dl_dh2 = dl_do2 * do2_dh2  # Dim (N, 1)
+            dl_w2 = np.matmul(dh2_dw2, dl_dh2)  # Dim (hidden_dim,)
+            dl_dh1 = np.multiply(
+                np.matmul(dl_dh2, dh2_do1), do1_dh1
+            )  # Dim (N, hidden_dim)
+            dl_w1 = np.matmul(
+                np.transpose(dh1_dw1), dl_dh1
+            )  # Dim (input_dim, hidden_dim)
+
+            self.grad["w1"] = dl_w1
+            self.grad["w2"] = dl_w2
+
+            self.grad["b1"] = np.sum(dl_dh1, axis=0)
+            self.grad["b2"] = np.sum(dl_dh2, axis=0)
+
+        return loss
+
+    def train(self, x_train: np.ndarray, y_train: np.ndarray) -> None:
+        '''
+        Assumption is that x_train and y_train have the right shape.
+        '''
+        for epoch in range(self.max_epochs):
+            loss = 0.0
+            for x, y in zip(x_train, y_train):
+                loss += self.forward(x, y)
+                self.update()
+
+            # Recording the stats
+            self.loss_history.append(loss / NUM_BATCH)
+
+
+def plot_loss_curve(loss_self, t_self, loss_sklearn, t_sklearn) -> None:
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel("Loss Value")
+    ax.set_title("Loss Curve", fontsize="large")
+
+    ax.plot(loss_self, color="r", label=f"Self NN. t={1000*t_self:>0.1f}ms")
+    ax.plot(loss_sklearn, color="b", label=f"Sklearn. t={1000*t_sklearn:>0.1f}ms")
+
+    ax.set_ylim(ymax=1.1 * np.minimum(np.max(loss_self), np.max(loss_sklearn)))
+
+    ax.legend()
+
+    plt.show()
+
+
+def plot_time_comparison(time_self, time_sklearn, batch) -> None:
+    fig, ax = plt.subplots()
+    ax.grid()
+    ax.set_xlabel("Total Batch Size")
+    ax.set_ylabel("Time (seconds)")
+    ax.set_title("Performance Comparison", fontsize="large")
+
+    ax.plot(batch, time_self, 'ro-', label=f"Self NN")
+    ax.plot(batch, time_sklearn, 'bo-', label=f"Sklearn")
+
+    ax.legend()
+
+    plt.show()
+
+
+print("Checkpoint - Model defined.")
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Comparing performance
+
+def compare_basic_performance():
+    sklearn_model = MLPRegressor(
+        hidden_layer_sizes=(HIDDEN_DIM,),
+        activation="logistic",
+        solver="sgd",
+        batch_size=BATCH_SIZE,
+        learning_rate_init=LEARNING_RATE,
+        max_iter=MAX_EPOCHS,
+        n_iter_no_change=MAX_EPOCHS
+    )
+
+    self_model = NeuralNetwork(
+        input_dim=NUM_FEATURES,
+        hidden_dim=HIDDEN_DIM,
+        learn_rate=LEARNING_RATE,
+        max_epochs=MAX_EPOCHS,
+    )
+
+    t1 = time.time()
+    self_model.train(X, Y)
+    t2 = time.time()
+    sklearn_model.fit(X.reshape(NUM_BATCH * BATCH_SIZE, NUM_FEATURES), Y.reshape(NUM_BATCH * BATCH_SIZE))
+    t3 = time.time()
+    
+    plot_loss_curve(self_model.get_loss(), t2 - t1, sklearn_model.loss_curve_, t3 - t2)
+
+def compare_data_size_performance():
+    sklearn_model = MLPRegressor(
+        hidden_layer_sizes=(HIDDEN_DIM,),
+        activation="logistic",
+        solver="sgd",
+        batch_size=BATCH_SIZE,
+        learning_rate_init=LEARNING_RATE,
+        max_iter=MAX_EPOCHS,
+        n_iter_no_change=MAX_EPOCHS
+    )
+
+    self_model = NeuralNetwork(
+        input_dim=NUM_FEATURES,
+        hidden_dim=HIDDEN_DIM,
+        learn_rate=LEARNING_RATE,
+        max_epochs=MAX_EPOCHS,
+    )
+
+    batch_size_exp = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    time_self = []
+    time_sklearn = []
+
+    for batch_num in batch_size_exp:
+        print(f"Num of Batches: {batch_num}")
+        x_try = np.random.randint(low=-20, high=20, size=(batch_num, BATCH_SIZE, NUM_FEATURES))
+        y_try = np.random.rand(batch_num, BATCH_SIZE, 1)
+
+        t1 = time.time()
+        self_model.train(x_try, y_try)
+        t2 = time.time()
+        
+        x_skl = x_try.reshape(batch_num * BATCH_SIZE, NUM_FEATURES)
+        y_skl = y_try.reshape(batch_num * BATCH_SIZE)
+
+        t3 = time.time()
+        sklearn_model.fit(x_skl, y_skl)
+        t4 = time.time()
+
+        time_self.append(t2-t1)
+        time_sklearn.append(t4-t3)
+
+    plot_time_comparison(time_self, time_sklearn, batch_size_exp)
+
+if __name__ == "__main__":
+    compare_basic_performance()
+    compare_data_size_performance()
